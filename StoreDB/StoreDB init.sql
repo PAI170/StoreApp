@@ -1,0 +1,36 @@
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'StoreDB')
+BEGIN
+	CREATE DATABASE StoreDB;
+END
+GO
+
+USE StoreDB;
+GO
+
+-- CREATE PRODUCTS
+IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Products' and xtype = 'U')
+BEGIN
+	CREATE TABLE Products (
+		Product_id INT NOT NULL,
+		SKU INT NOT NULL,
+		Name VARCHAR(50) NOT NULL,
+		Price DECIMAL(10,2) NOT NULL,
+		Quantity INT NOT NULL,
+		CONSTRAINT PKProduct PRIMARY KEY (Product_id),
+		CONSTRAINT UXSKU UNIQUE (SKU),
+	)
+END
+GO
+
+-- CREATE SHOPPING CART
+IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'ShoppingCart' and xtype = 'U')
+BEGIN
+	CREATE TABLE ShoppingCart (
+		ID INT NOT NULL,
+		SKU INT NOT NULL,
+		Quantity INT NOT NULL,
+		Subtotal DECIMAL(10,2) NOT NULL,
+		IVA DECIMAL(10,2) NOT NULL,
+		Total DECIMAL(10,2) NOT NULL,
+		CONSTRAINT PKID PRIMARY KEY (ID),
+)
