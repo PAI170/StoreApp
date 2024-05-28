@@ -12,14 +12,12 @@ IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Products' and xtype = 
 BEGIN
 	CREATE TABLE Products (
 		Product_Id INT IDENTITY (1,1) NOT NULL,
-		SKU INT NOT NULL,
 		Product_Name VARCHAR(50) NOT NULL,
 		Price DECIMAL(10,2) NOT NULL,
-		Quantity INT NOT NULL,
+		Quantity SMALLINT NOT NULL,
 		StateID INT NOT NULL,
 		CategoriesID INT NOT NULL,
 		CONSTRAINT PKProduct PRIMARY KEY (Product_Id),
-		CONSTRAINT UXSKU UNIQUE (SKU),
 		CONSTRAINT FKProductStateId FOREIGN KEY (StateID) REFERENCES States(Id),
 		CONSTRAINT FKProductCategoryID FOREIGN KEY (CategoriesID) REFERENCES Categories(Id)
 	)
@@ -32,7 +30,9 @@ BEGIN
 	CREATE TABLE Categories (
 	Id INT IDENTITY (1,1) NOT NULL,
 	Categories_Name VARCHAR(50) NOT NULL,
-	CONSTRAINT PKCategories PRIMARY KEY (Id)
+	StateID INT NOT NULL,
+	CONSTRAINT PKCategories PRIMARY KEY (Id),
+	CONSTRAINT PKStateCategories FOREIGN KEY (StateID) REFERENCES States (Id)
 	)
 END
 GO
@@ -52,8 +52,7 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Customer' and xtype = 'U')
 BEGIN
 	CREATE TABLE Customer (
-		Id INT IDENTITY (1,1) NOT NULL,
-		DocumentId INT NOT NULL, 
+		Id INT IDENTITY (1,1) NOT NULL, 
 		Name VARCHAR(50) NOT NULL,
 		LastName VARCHAR(50) NOT NULL,
 		PhoneNumber INT NOT NULL,
@@ -61,8 +60,7 @@ BEGIN
 		State VARCHAR (50) NOT NULL,
 		City VARCHAR(50) NOT NULL,
 		Addres VARCHAR (50) NOT NULL,
-		CONSTRAINT PKDocumentId PRIMARY KEY (Id),
-		CONSTRAINT UXDocumentId UNIQUE (DocumentId)
+		CONSTRAINT PKCustomerId PRIMARY KEY (Id)
 	)
 END
 GO 
@@ -72,7 +70,7 @@ IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Orders' and xtype = 'U
 BEGIN
 	CREATE TABLE Orders (
 		Id INT IDENTITY (1,1) NOT NULL,
-		Purchase_Order INT IDENTITY (1,1) NOT NULL,
+		Purchase_Order NVARCHAR(20) NOT NULL,
 		Date DATETIME2(7) NOT NULL,
 		Product_Id INT NOT NULL,
 		Customer_Id INT NOT NULL,
@@ -82,3 +80,17 @@ BEGIN
 		CONSTRAINT FKCustomerOrderId FOREIGN KEY (Customer_Id) REFERENCES Customer(Id)
 	)
 END
+GO
+
+CREATE TRIGGER GenerateOrder
+ON Orders
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE Orders
+    SET Purchase_Order = FORMAT(i.Date, 'yyyyMMdd') + CAST(i.Customer_Id AS NVARCHAR(10))
+    FROM inserted i
+    WHERE Orders.Id = i.Id;
+END;
