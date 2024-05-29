@@ -7,6 +7,19 @@ GO
 USE StoreDB;
 GO
 
+-- CREATE CATEGORIES
+IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Categories' and xtype = 'U')
+BEGIN
+	CREATE TABLE Categories (
+	Id INT IDENTITY (1,1) NOT NULL,
+	Categories_Name VARCHAR(50) NOT NULL,
+	StateID INT NOT NULL,
+	CONSTRAINT PKCategories PRIMARY KEY (Id),
+	CONSTRAINT PKStateCategories FOREIGN KEY (StateID) REFERENCES States (Id)
+	);
+END
+GO
+
 -- CREATE PRODUCTS
 IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Products' and xtype = 'U')
 BEGIN
@@ -19,21 +32,8 @@ BEGIN
 		CategoriesID INT NOT NULL,
 		CONSTRAINT PKProduct PRIMARY KEY (Product_Id),
 		CONSTRAINT FKProductStateId FOREIGN KEY (StateID) REFERENCES States(Id),
-		CONSTRAINT FKProductCategoryID FOREIGN KEY (CategoriesID) REFERENCES Categories(Id)
-	)
-END
-GO
-
--- CREATE CATEGORIES
-IF NOT EXISTS (SELECT * FROM sys.sysobjects WHERE name = 'Categories' and xtype = 'U')
-BEGIN
-	CREATE TABLE Categories (
-	Id INT IDENTITY (1,1) NOT NULL,
-	Categories_Name VARCHAR(50) NOT NULL,
-	StateID INT NOT NULL,
-	CONSTRAINT PKCategories PRIMARY KEY (Id),
-	CONSTRAINT PKStateCategories FOREIGN KEY (StateID) REFERENCES States (Id)
-	)
+		CONSTRAINT FKProductCategoryID FOREIGN KEY (CategoriesID) REFERENCES Categories (Id)
+	);
 END
 GO
 
@@ -44,7 +44,7 @@ BEGIN
 		Id INT IDENTITY (1,1) NOT NULL,
 		State_Name VARCHAR(50) NOT NULL,
 		CONSTRAINT PKState PRIMARY KEY (Id)
-	)
+	);
 END
 GO
 
@@ -59,9 +59,9 @@ BEGIN
 		Country VARCHAR(50) NOT NULL,
 		State VARCHAR (50) NOT NULL,
 		City VARCHAR(50) NOT NULL,
-		Addres VARCHAR (50) NOT NULL,
+		Address VARCHAR (50) NOT NULL,
 		CONSTRAINT PKCustomerId PRIMARY KEY (Id)
-	)
+	);
 END
 GO 
 
@@ -78,7 +78,7 @@ BEGIN
 		CONSTRAINT UXPurchaseOrder UNIQUE (Purchase_Order),
 		CONSTRAINT FKProductOrderId FOREIGN KEY (Product_Id) REFERENCES Products(Product_Id),
 		CONSTRAINT FKCustomerOrderId FOREIGN KEY (Customer_Id) REFERENCES Customer(Id)
-	)
+	);
 END
 GO
 
