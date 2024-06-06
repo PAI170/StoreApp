@@ -6,4 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="DbScaffold.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="DbScaffold.ps1" />
+  </ItemGroup>
+
 </Project>
